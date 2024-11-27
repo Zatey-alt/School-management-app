@@ -15,13 +15,28 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      const role = user?.publicMetadata.role;
-      if (role) {
-        router.push(`/${role}`);
-      }
+    if (!isLoaded) {
+      console.log("User data not yet loaded.");
+      return; // Wait for user data to load
+    }
+  
+    if (!isSignedIn) {
+      console.log("User is not signed in.");
+      router.push("/"); // Redirect to the sign-in page
+      return;
+    }
+  
+    const role = user?.publicMetadata?.role;
+  
+    if (role) {
+      console.log("Redirecting to role-based page:", `${role}`);
+      router.push(`/${role}`); // Redirect based on role
+    } else {
+      console.error("Role is undefined or invalid:", user?.publicMetadata);
+      router.push("/"); // Fallback redirection
     }
   }, [isLoaded, isSignedIn, user, router]);
+  
   
 
   return (
@@ -42,9 +57,7 @@ const LoginPage = () => {
             <h2 className="text-gray-400 text-center">Sign in to your account</h2>
             <Clerk.GlobalError className="text-sm text-red-400" />
             <Clerk.Field name="identifier" className="flex flex-col gap-2">
-              <Clerk.Label className="text-xs text-gray-500">
-                Username
-              </Clerk.Label>
+              <Clerk.Label className="text-xs text-gray-500">Username</Clerk.Label>
               <Clerk.Input
                 type="text"
                 required
@@ -53,9 +66,7 @@ const LoginPage = () => {
               <Clerk.FieldError className="text-xs text-red-400" />
             </Clerk.Field>
             <Clerk.Field name="password" className="flex flex-col gap-2">
-              <Clerk.Label className="text-xs text-gray-500">
-                Password
-              </Clerk.Label>
+              <Clerk.Label className="text-xs text-gray-500">Password</Clerk.Label>
               <div className="relative">
                 <Clerk.Input
                   type={showPassword ? "text" : "password"}
