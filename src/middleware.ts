@@ -7,21 +7,34 @@ const matchers = Object.keys(routeAccessMap).map((route) => ({
   allowedRoles: routeAccessMap[route],
 }));
 
-console.log(matchers);
+console.log("Route matchers:", matchers);
 
 export default clerkMiddleware((auth, req) => {
-  // if (isProtectedRoute(req)) auth().protect()
-
   const { sessionClaims } = auth();
 
-  const role = (sessionClaims?.metadata as { role?: string })?.role;
+  // Log session claims for debugging
+  console.log("Session claims:", sessionClaims);
 
+  // Extract role from user_public_metadata
+  const role = sessionClaims?.user_public_metadata?.role;
+
+  if (!role) {
+    console.warn(
+      "Role is missing or undefined. Please ensure it is properly configured in Clerk."
+    );
+  }
+
+  console.log("User role:", role);
+
+  // Access control logic
   for (const { matcher, allowedRoles } of matchers) {
-    if (matcher(req) && !allowedRoles.includes(role!)) {
-      return NextResponse.redirect(new URL(`/${role}`, req.url));
+    if (matcher(req) && (!role || !allowedRoles.includes(role))) {
+      console.warn(`Access denied for role: ${role} on route: ${req.url}`);
+      return NextResponse.redirect(new URL("/", req.url)); // Redirect to an error page
     }
   }
 });
+
 
 export const config = {
   matcher: [

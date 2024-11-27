@@ -11,34 +11,27 @@ import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
 const LoginPage = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    if (!isLoaded) {
-      console.log("User data not yet loaded.");
-      return; // Wait for user data to load
-    }
+    try {
+      if (isLoaded && isSignedIn && user) {
+        const role = user.publicMetadata?.role;
+        console.log("Role fetched:", role);
   
-    if (!isSignedIn) {
-      console.log("User is not signed in.");
-      router.push("/"); // Redirect to the sign-in page
-      return;
-    }
-  
-    const role = user?.publicMetadata?.role;
-  
-    if (role) {
-      console.log("Redirecting to role-based page:", `${role}`);
-      router.push(`/${role}`); // Redirect based on role
-    } else {
-      console.error("Role is undefined or invalid:", user?.publicMetadata);
-      router.push("/"); // Fallback redirection
+        if (role) {
+          router.push(`/${role}`);
+        } else {
+          router.push("/default");
+        }
+      }
+    } catch (error) {
+      console.error("Error during redirection:", error);
+      router.push("/error"); // Optional: redirect to an error page
     }
   }, [isLoaded, isSignedIn, user, router]);
   
   
-
   return (
     <div className="h-screen flex flex-col md:flex-row">
       {/* Left Side */}
