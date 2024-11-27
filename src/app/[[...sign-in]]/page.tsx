@@ -15,7 +15,6 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    // Redirect based on user role after sign-in
     if (isLoaded && isSignedIn) {
       const role = user?.publicMetadata.role;
       if (role) {
@@ -23,6 +22,7 @@ const LoginPage = () => {
       }
     }
   }, [isLoaded, isSignedIn, user, router]);
+  
 
   return (
     <div className="h-screen flex flex-col md:flex-row">
