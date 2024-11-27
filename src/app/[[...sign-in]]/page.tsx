@@ -12,29 +12,17 @@ const LoginPage = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
 
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    const role = user?.publicMetadata.role;
-
-    if (role) {
-      router.push(`/${role}`);
+    // Redirect based on user role after sign-in
+    if (isLoaded && isSignedIn) {
+      const role = user?.publicMetadata.role;
+      if (role) {
+        router.push(`/${role}`);
+      }
     }
-  }, [user, router]);
-
-  const handleSignIn = async () => {
-    setIsLoading(true);
-    // Simulate sign-in process; this is just an example.
-    try {
-      // Add your actual sign-in logic here if needed.
-      console.log("Signing in...");
-    } catch (err) {
-      console.error("Sign-in failed:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [isLoaded, isSignedIn, user, router]);
 
   return (
     <div className="h-screen flex flex-col md:flex-row">
@@ -48,10 +36,10 @@ const LoginPage = () => {
             name="start"
             className="bg-white p-8 md:p-12 rounded-md flex flex-col gap-4 w-full max-w-md"
           >
-            <div className="flex-start ">
+            <div className="flex justify-center">
               <Image src="/logo.png" alt="Logo" width={150} height={150} />
             </div>
-            <h2 className="text-gray-400">Sign in to your account</h2>
+            <h2 className="text-gray-400 text-center">Sign in to your account</h2>
             <Clerk.GlobalError className="text-sm text-red-400" />
             <Clerk.Field name="identifier" className="flex flex-col gap-2">
               <Clerk.Label className="text-xs text-gray-500">
@@ -88,38 +76,12 @@ const LoginPage = () => {
               </div>
               <Clerk.FieldError className="text-xs text-red-400" />
             </Clerk.Field>
-            <button
-              onClick={handleSignIn}
-              disabled={isLoading}
-              className={`flex items-center justify-center bg-blue-500 text-white my-1 rounded-md text-sm p-[10px] ${
-                isLoading ? "opacity-70 cursor-not-allowed" : ""
-              }`}
+            <SignIn.Action
+              submit
+              className="bg-blue-500 text-white my-1 rounded-md text-sm p-[10px] flex justify-center"
             >
-              {isLoading ? (
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  ></path>
-                </svg>
-              ) : (
-                "Sign In"
-              )}
-            </button>
+              Sign In
+            </SignIn.Action>
           </SignIn.Step>
         </SignIn.Root>
       </div>

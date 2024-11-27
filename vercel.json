@@ -1,0 +1,13 @@
+{
+    "builds": [
+      {
+        "src": "package.json",
+        "use": "@vercel/node"
+      }
+    ],
+    "hooks": {
+      "build": "npm run build",
+      "post-build": "npx prisma generate"
+    }
+  }
+  
