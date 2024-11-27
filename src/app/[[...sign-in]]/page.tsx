@@ -26,7 +26,7 @@ const LoginPage = () => {
 
   return (
     <div className="h-screen flex flex-col md:flex-row">
-      {/* Left Side: Colored Background */}
+      {/* Left Side */}
       <div className="md:w-1/2 w-full bg-blue-500 h-1/3 md:h-full"></div>
 
       {/* Right Side: Login Form */}
