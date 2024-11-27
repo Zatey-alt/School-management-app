@@ -1,15 +1,37 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
-const prismaClientSingleton = () => {
-  return new PrismaClient()
+// Extend globalThis to allow for prismaGlobal
+declare global {
+  var prismaGlobal: PrismaClient | undefined;
 }
 
-declare const globalThis: {
-  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
-} & typeof global;
+let prisma: PrismaClient;
 
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
+// Define a type for valid NODE_ENV values
+type NodeEnv = 'production' | 'development' | 'test';
 
-export default prisma
+// Narrow the type of NODE_ENV using a runtime check
+const getNodeEnv = (): NodeEnv => {
+  const env = process.env.NODE_ENV;
+  if (env === 'production' || env === 'development' || env === 'test') {
+    return env;
+  }
+  console.warn(`NODE_ENV is not set or invalid. Defaulting to 'development'.`);
+  return 'development';
+};
 
-if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma
+const nodeEnv = getNodeEnv();
+
+if (nodeEnv === 'production') {
+  prisma = new PrismaClient();
+} else {
+  // In development or serverless environments, reuse Prisma client to avoid reinitialization
+  if (globalThis.prismaGlobal) {
+    prisma = globalThis.prismaGlobal;
+  } else {
+    prisma = new PrismaClient();
+    globalThis.prismaGlobal = prisma;
+  }
+}
+
+export default prisma;
