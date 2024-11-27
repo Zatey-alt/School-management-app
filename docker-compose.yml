@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  postgress:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    
+  app:
+    build: .
+    container_name: nextjs_app
+    ports:
+      - '3000:3000'
+    environment:
+      - DATABASE_URL: postgresql://school_data_k05g_user:P7KL9llFCrd3XmAGYwvRz1HsJWShNXwm@dpg-ct3dfdij1k6c73e675kg-a.oregon-postgres.render.com/school_data_k05g
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
